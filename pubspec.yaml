@@ -49,6 +49,7 @@ dependencies:
   external_path: ^1.0.3
   dropdown_search: ^5.0.6
   flutter_barcode_scanner: ^2.0.0
+  qr_code_scanner: ^1.0.1
 
 dev_dependencies:
   flutter_test:

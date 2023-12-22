@@ -9,16 +9,16 @@ import 'package:mobilestock/model/item_model.dart';
 import 'package:mobilestock/repository/webservice_repository.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-class CartDetailScreen extends StatefulWidget {
+class DocDetailScreen extends StatefulWidget {
   final CartModel cart;
-  final int ismerge;
-  const CartDetailScreen({super.key, required this.cart, required this.ismerge});
+  final int status;
+  const DocDetailScreen({super.key, required this.cart, required this.status});
 
   @override
-  State<CartDetailScreen> createState() => _CartDetailScreenState();
+  State<DocDetailScreen> createState() => _DocDetailScreenState();
 }
 
-class _CartDetailScreenState extends State<CartDetailScreen> {
+class _DocDetailScreenState extends State<DocDetailScreen> {
   final TextEditingController _controller = TextEditingController();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final WebServiceRepository _webServiceRepository = WebServiceRepository();
@@ -62,6 +62,19 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
     } else {
       barcode = textsplit[0];
     }
+    ItemScanModel itemCheck = itemScanList.firstWhere((ele) => ele.barcode == barcode, orElse: () => ItemScanModel(barcode: "", itemcode: "", unitcode: "", itemname: ""));
+
+    if (itemCheck.barcode == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("บาร์โค้ดสินค้าไม่ตรงกับรายการนับซ้ำ"),
+          backgroundColor: Colors.red,
+        ),
+      );
+
+      return;
+    }
+
     await _webServiceRepository.getItemDetail(barcode).then((value) {
       if (value.success) {
         if (value.data.length > 0) {
@@ -107,8 +120,8 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
     });
   }
 
-  void getCartDetail() async {
-    await _webServiceRepository.getCartDetail(widget.cart.docno).then((value) {
+  void getCartSubDetail() async {
+    await _webServiceRepository.getCartSubDetail(widget.cart.docno).then((value) {
       if (value.success) {
         if (value.data.length > 0) {
           setState(() {
@@ -135,7 +148,7 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
 
   @override
   void initState() {
-    getCartDetail();
+    getCartSubDetail();
     super.initState();
   }
 
@@ -176,7 +189,7 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
           },
           icon: const Icon(Icons.arrow_back),
         ),
-        backgroundColor: Colors.blue.shade600,
+        backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
         title: const Text('รายละเอียดสินค้า'),
       ),
@@ -234,52 +247,52 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
             const Divider(
               thickness: 1,
             ),
-            if (widget.ismerge == 0)
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      onSubmitted: (value) {
-                        getItemDetail();
-                      },
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                        labelText: 'Scan result',
-                        border: OutlineInputBorder(),
-                      ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    autofocus: true,
+                    onSubmitted: (value) {
+                      getItemDetail();
+                    },
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      labelText: 'Scan result',
+                      border: OutlineInputBorder(),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {
-                      final res = Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CartItemSearch(),
-                        ),
-                      );
-                      res.then((value) {
-                        if (value != null) {
-                          ItemModel item = value as ItemModel;
-                          setState(() {
-                            _controller.text += item.barcode;
-                            getItemDetail();
-                          });
-                        }
-                      });
-                    },
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.camera_alt),
-                    onPressed: () {
-                      scanBarcodeNormal();
-                    },
-                  ),
-                ],
-              ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    final res = Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CartItemSearch(),
+                      ),
+                    );
+                    res.then((value) {
+                      if (value != null) {
+                        ItemModel item = value as ItemModel;
+                        setState(() {
+                          _controller.text += item.barcode;
+                          getItemDetail();
+                        });
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.camera_alt),
+                  onPressed: () {
+                    scanBarcodeNormal();
+                  },
+                ),
+              ],
+            ),
             Expanded(
               child: ListView.builder(
                   itemCount: itemScanList.length,
@@ -300,23 +313,10 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
                           ),
                           title: Text(itemScanList[index].itemname),
                           subtitle: Text("${itemScanList[index].barcode} ${itemScanList[index].unitcode}"),
-                          trailing: (widget.ismerge == 0)
-                              ? IconButton(
-                                  onPressed: () {
-                                    _showConfirmDialog(index);
-                                  },
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                )
-                              : const SizedBox(
-                                  width: 0,
-                                ),
                         ));
                   }),
             ),
-            if (widget.ismerge == 0)
+            if (widget.status == 0)
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -378,7 +378,7 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
             ),
             TextButton(
               onPressed: () async {
-                await _webServiceRepository.saveCartDetail(itemScanList, widget.cart).then((value) {
+                await _webServiceRepository.saveCartSubDetail(itemScanList, widget.cart).then((value) {
                   if (value.success) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

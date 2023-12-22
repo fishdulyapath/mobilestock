@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:mobilestock/bloc/authentication/authentication_bloc.dart';
 import 'package:mobilestock/bloc/webservice/webservice_bloc.dart';
+import 'package:mobilestock/global.dart' as global;
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -17,6 +18,12 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    global.loadConfig();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +49,13 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
           body: Column(
             children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Text(
+                global.branchName,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(
                 height: 20,
               ),
@@ -81,9 +95,11 @@ class _MenuScreenState extends State<MenuScreen> {
                         ),
                         backgroundColor: Colors.orangeAccent.shade700,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/doclist');
+                      },
                       child: const Text(
-                        "รายการอนุมัติ",
+                        "รายการนับซ้ำ",
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       )),
                 ),

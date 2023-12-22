@@ -10,7 +10,6 @@ class Client {
     if (endPointService.isNotEmpty) {
       endPointService += endPointService[endPointService.length - 1] == "/" ? "" : "/";
     }
-    endPointService += "SMLJavaWebService/";
 
     dio.options.baseUrl = endPointService;
 

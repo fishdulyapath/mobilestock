@@ -4,22 +4,24 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mobilestock/core/client.dart';
 import 'package:mobilestock/model/cart_model.dart';
 import 'package:mobilestock/model/warehouse_location.dart';
 import 'package:mobilestock/repository/webservice_repository.dart';
 import 'package:mobilestock/global.dart' as global;
 
-class CartFormScreen extends StatefulWidget {
-  final CartModel cart;
-  const CartFormScreen({super.key, required this.cart});
+class CartMergeScreen extends StatefulWidget {
+  final List<CartModel> cart;
+  const CartMergeScreen({super.key, required this.cart});
 
   @override
-  State<CartFormScreen> createState() => _CartFormScreenState();
+  State<CartMergeScreen> createState() => _CartMergeScreenState();
 }
 
-class _CartFormScreenState extends State<CartFormScreen> {
+class _CartMergeScreenState extends State<CartMergeScreen> {
   final TextEditingController basketNumberController = TextEditingController();
+  final TextEditingController docdateTime = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   WarehouseModel selectedWarehouse = WarehouseModel();
   LocationModel selectedLocation = LocationModel();
@@ -28,21 +30,31 @@ class _CartFormScreenState extends State<CartFormScreen> {
   List<WarehouseModel> warehouses = [];
   List<LocationModel> locations = [];
   TextEditingController remarkController = TextEditingController();
-
+  TextEditingController cartsController = TextEditingController();
+  TextEditingController userCodeController = TextEditingController(text: "${global.userCode}~${global.userName}");
   @override
   void initState() {
     super.initState();
-    getWareHouse();
-    if (widget.cart.docno.isNotEmpty) {
-      basketNumberController.text = widget.cart.docno;
-      selectedWarehouse = WarehouseModel(code: widget.cart.whcode, name: widget.cart.whname);
-      remarkController.text = widget.cart.remark;
+
+    if (widget.cart.isNotEmpty) {
+      basketNumberController.text = generateBasketNumber();
+      selectedWarehouse = WarehouseModel(code: widget.cart[0].whcode, name: widget.cart[0].whname);
+
+      docdateTime.text = "${widget.cart[0].docdate} ${formatTime(widget.cart[0].doctime)}";
+      for (var ele in widget.cart) {
+        cartsController.text += "${ele.docno}\n";
+      }
+      remarkController.text = widget.cart[0].remark;
       Future.delayed(const Duration(milliseconds: 300), () async {
         getLocation();
       });
-    } else {
-      basketNumberController.text = generateBasketNumber();
     }
+  }
+
+  String formatTime(String timeString) {
+    // Assuming the input is always correctly formatted as "HH:mm:ss.SSSSS"
+    final time = DateTime.parse("1970-01-01 $timeString"); // Dummy date
+    return DateFormat('HH:mm').format(time); // Format to "HH:mm"
   }
 
   void getWareHouse() async {
@@ -74,8 +86,8 @@ class _CartFormScreenState extends State<CartFormScreen> {
       if (value.success) {
         setState(() {
           locations = (value.data as List).map((data) => LocationModel.fromJson(data)).toList();
-          if (widget.cart.docno.isNotEmpty) {
-            selectedLocation = LocationModel(code: widget.cart.locationcode, name: widget.cart.locationname);
+          if (widget.cart[0].docno.isNotEmpty) {
+            selectedLocation = LocationModel(code: widget.cart[0].locationcode, name: widget.cart[0].locationname);
           }
         });
       } else {
@@ -102,9 +114,9 @@ class _CartFormScreenState extends State<CartFormScreen> {
       appBar: AppBar(
         backgroundColor: Colors.green.shade600,
         foregroundColor: Colors.white,
-        title: Text(
-          (widget.cart.docno.isEmpty) ? 'สร้างตะกร้าตรวจนับ' : 'แก้ไขตะกร้าตรวจนับ',
-          style: const TextStyle(fontWeight: FontWeight.w400),
+        title: const Text(
+          'รวมตะกร้า',
+          style: TextStyle(fontWeight: FontWeight.w400),
         ),
       ),
       body: SingleChildScrollView(
@@ -122,7 +134,26 @@ class _CartFormScreenState extends State<CartFormScreen> {
                 readOnly: true, // Prevent editing
               ),
               const SizedBox(height: 16.0),
+              TextFormField(
+                controller: docdateTime,
+                decoration: const InputDecoration(
+                  labelText: 'วันเวลาตรวจนับ',
+                  border: OutlineInputBorder(),
+                ),
+                readOnly: true, // Prevent editing
+              ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                controller: userCodeController,
+                decoration: const InputDecoration(
+                  labelText: 'ผู้สร้าง',
+                  border: OutlineInputBorder(),
+                ),
+                readOnly: true, // Prevent editing
+              ),
+              const SizedBox(height: 16.0),
               DropdownSearch<WarehouseModel>(
+                enabled: false,
                 popupProps: const PopupProps.bottomSheet(
                   showSearchBox: true,
                 ),
@@ -151,7 +182,7 @@ class _CartFormScreenState extends State<CartFormScreen> {
               ),
               const SizedBox(height: 16.0),
               DropdownSearch<LocationModel>(
-                enabled: selectedWarehouse.code.isNotEmpty && locations.isNotEmpty,
+                enabled: false,
                 popupProps: const PopupProps.bottomSheet(
                   showSearchBox: true,
                 ),
@@ -170,6 +201,15 @@ class _CartFormScreenState extends State<CartFormScreen> {
                   selectedLocation = val!;
                 },
                 selectedItem: selectedLocation,
+              ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                controller: cartsController,
+                decoration: const InputDecoration(
+                  labelText: 'ตะกร้าที่เลือก',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
               ),
               const SizedBox(height: 16.0),
               TextFormField(
@@ -200,70 +240,47 @@ class _CartFormScreenState extends State<CartFormScreen> {
                         );
                         return;
                       } else {
-                        if (widget.cart.docno.isEmpty) {
-                          await _webServiceRepository.createCart(basketNumberController.text, selectedWarehouse.code, selectedLocation.code, remarkController.text).then((value) {
-                            if (value.success) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("สร้างตะกร้าสำเร็จ"),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
+                        var cartsarr = widget.cart.map((e) => e.docno).toList();
+                        String result = cartsarr.join(',');
 
-                              Navigator.of(context).pop("success");
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(value.message),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          }).onError((error, stackTrace) {
+                        await _webServiceRepository
+                            .mergeCart(basketNumberController.text, widget.cart[0].docdate, widget.cart[0].doctime, selectedWarehouse.code, selectedLocation.code,
+                                remarkController.text, result)
+                            .then((value) {
+                          if (value.success) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("สร้างตะกร้ารวมสำเร็จ"),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+
+                            Navigator.of(context).pop("success");
+                          } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(error.toString()),
+                                content: Text(value.message),
                                 backgroundColor: Colors.red,
                               ),
                             );
-                          });
-                        } else {
-                          await _webServiceRepository.updateCart(basketNumberController.text, selectedWarehouse.code, selectedLocation.code, remarkController.text).then((value) {
-                            if (value.success) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("แก้ไขตะกร้าสำเร็จ"),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-
-                              Navigator.of(context).pop("success");
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(value.message),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          }).onError((error, stackTrace) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(error.toString()),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          });
-                        }
+                          }
+                        }).onError((error, stackTrace) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(error.toString()),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        });
                       }
                     },
                     icon: const Icon(
                       Icons.save_alt_rounded,
                       color: Colors.white,
                     ),
-                    label: Text(
-                      (widget.cart.docno.isEmpty) ? "สร้างตะกร้า" : "แก้ไขตะกร้า",
-                      style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w600),
+                    label: const Text(
+                      "สร้างตะกร้า",
+                      style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w600),
                     )),
               )
             ],

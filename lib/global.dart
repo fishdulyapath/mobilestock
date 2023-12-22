@@ -6,6 +6,8 @@ String serverProvider = "";
 String serverDatabase = "";
 String userCode = "";
 String userName = "";
+String branchCode = "";
+String branchName = "";
 
 Future<void> initializeConfig() async {
   await GetStorage.init("SMLConfig");
@@ -16,7 +18,9 @@ Future<void> initializeConfig() async {
 Future<void> loadConfig() async {
   serverHost = appStorage.read("host") ?? "";
   serverProvider = appStorage.read("provider") ?? "";
-  serverDatabase = appStorage.read("database") ?? "";
+  serverDatabase = appStorage.read("dbname") ?? "";
   userCode = appStorage.read("usercode") ?? "";
   userName = appStorage.read("username") ?? "";
+  branchCode = appStorage.read("branchcode") ?? "";
+  branchName = appStorage.read("branchname") ?? "";
 }

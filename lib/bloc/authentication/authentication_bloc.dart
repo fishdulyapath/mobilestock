@@ -21,7 +21,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
         global.appStorage.write("usercode", event.username);
         global.appStorage.write("provider", event.provider);
         global.appStorage.write("dbname", event.dbName);
-        global.appStorage.write("username", result.data);
+        global.appStorage.write("username", event.username);
         emit(AuthenticationSuccess(result.data));
       } else {
         emit(AuthenticationError(result.message));

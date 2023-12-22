@@ -12,18 +12,18 @@ class AuthRepository {
       UserLoginModel user = UserLoginModel(
         databasename: dbname,
         provider: provider,
-        usercode: username,
-        userpassword: password,
+        user: username,
+        pass: password,
       );
-      final response = await client.post('/webresources/rest/ulogin/', data: user.toJson());
+      final response = await client.get('/authentication?provider=$provider&user=$username&pass=$password');
       final rawData = json.decode(response.toString());
       if (rawData['error'] != null) {
         throw Exception('${rawData['code']}: ${rawData['message']}');
       }
-      if (response.statusCode == 200) {
+      if (rawData['success']) {
         return ApiResponse.fromMap({
           'success': true,
-          'data': rawData['user_name'],
+          'data': "",
         });
       } else {
         throw Exception('${response.statusCode}: ${response.statusMessage}');

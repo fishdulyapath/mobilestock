@@ -3,30 +3,31 @@ import 'package:intl/intl.dart';
 import 'package:mobilestock/features/cart/cart_detail_screen.dart';
 import 'package:mobilestock/features/cart/cart_form_screen.dart';
 import 'package:mobilestock/features/cart/cart_merge_screen.dart';
+import 'package:mobilestock/features/doc/doc_detail_screen.dart';
 import 'package:mobilestock/model/cart_model.dart';
 import 'package:mobilestock/repository/webservice_repository.dart';
 
-class CartListScreen extends StatefulWidget {
-  const CartListScreen({super.key});
+class DocListScreen extends StatefulWidget {
+  const DocListScreen({super.key});
 
   @override
-  State<CartListScreen> createState() => _CartListScreenState();
+  State<DocListScreen> createState() => _DocListScreenState();
 }
 
-class _CartListScreenState extends State<CartListScreen> {
+class _DocListScreenState extends State<DocListScreen> {
   final WebServiceRepository _webServiceRepository = WebServiceRepository();
   List<CartModel> carts = [];
   List<bool> checked = [];
   bool showCheckbox = false;
   @override
   void initState() {
-    getCartList();
+    getDocList();
 
     super.initState();
   }
 
-  void getCartList() async {
-    await _webServiceRepository.getCartList().then((value) {
+  void getDocList() async {
+    await _webServiceRepository.getCartSubList().then((value) {
       if (value.success) {
         setState(() {
           carts = (value.data as List).map((data) => CartModel.fromJson(data)).toList();
@@ -60,82 +61,15 @@ class _CartListScreenState extends State<CartListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.green.shade600,
+          backgroundColor: Colors.orange,
           foregroundColor: Colors.white,
-          title: const Text('ตะกร้าตรวจนับ'),
+          title: const Text('รายการนับซ้ำ'),
         ),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      ElevatedButton.icon(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-                          foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                        onPressed: () {
-                          final res = Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CartFormScreen(cart: CartModel(docno: '')),
-                            ),
-                          );
-                          res.then((value) {
-                            getCartList();
-                          });
-                        },
-                        icon: const Icon(Icons.add),
-                        label: const Text(
-                          "สร้างตะกร้าใหม่",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      ElevatedButton.icon(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(Colors.orange),
-                          foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            showCheckbox = !showCheckbox;
-                          });
-                        },
-                        icon: const Icon(Icons.compare_arrows),
-                        label: const Text(
-                          "รวมตะกร้า",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(
-                  height: 8,
-                  color: Colors.grey.shade300,
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
                 Expanded(
                     child: SingleChildScrollView(
                   child: Column(
@@ -156,11 +90,7 @@ class _CartListScreenState extends State<CartListScreen> {
                             ),
                             Expanded(
                               child: Card(
-                                color: (carts[index].ismerge == 0)
-                                    ? (carts[index].carts.isNotEmpty)
-                                        ? Colors.blue.shade100
-                                        : Colors.white
-                                    : Colors.green.shade100,
+                                color: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4.0),
                                 ),
@@ -187,7 +117,7 @@ class _CartListScreenState extends State<CartListScreen> {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
                                           Text('วันที่: ${'${carts[index].docdate} เวลา${formatTime(carts[index].doctime)}'}'),
-                                          Text('Creator: ${carts[index].creatorname}'),
+                                          Text('ผู้สร้าง: ${carts[index].creatorname}'),
                                         ],
                                       ),
                                       const SizedBox(height: 1.0),
@@ -232,7 +162,7 @@ class _CartListScreenState extends State<CartListScreen> {
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
-                                          Text('หมายเหตุ: ${carts[index].remark}'),
+                                          Text('ตะกร้าหลัก: ${carts[index].docref}'),
                                         ],
                                       ),
                                       const SizedBox(height: 1.0),
@@ -243,39 +173,14 @@ class _CartListScreenState extends State<CartListScreen> {
                                           Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: <Widget>[
-                                              if (carts[index].ismerge == 0)
-                                                IconButton(
-                                                  color: Colors.green,
-                                                  icon: const Icon(Icons.play_circle_outline),
-                                                  onPressed: () {
-                                                    if (carts[index].itemcount > 0) {
-                                                      _showConfirmSendDialog(context, carts[index].docno);
-                                                    } else {
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        const SnackBar(
-                                                          content: Text("ไม่มีสินค้าในตะกร้า"),
-                                                          backgroundColor: Colors.red,
-                                                        ),
-                                                      );
-                                                    }
-                                                  },
-                                                ),
-                                              if (carts[index].ismerge == 0)
-                                                IconButton(
-                                                  color: Colors.orange,
-                                                  icon: const Icon(Icons.edit),
-                                                  onPressed: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) => CartFormScreen(cart: carts[index]),
-                                                      ),
-                                                    ).then((value) {
-                                                      getCartList();
-                                                    });
-                                                  },
-                                                ),
-                                              const SizedBox(
+                                              IconButton(
+                                                color: Colors.green,
+                                                icon: const Icon(Icons.play_circle_outline),
+                                                onPressed: () {
+                                                  _showConfirmSendDialog(context, carts[index].docno);
+                                                },
+                                              ),
+                                              SizedBox(
                                                 width: 8,
                                               ),
                                               IconButton(
@@ -285,24 +190,16 @@ class _CartListScreenState extends State<CartListScreen> {
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => CartDetailScreen(cart: carts[index], ismerge: carts[index].ismerge),
+                                                      builder: (context) => DocDetailScreen(cart: carts[index], status: carts[index].status),
                                                     ),
                                                   ).then((value) {
-                                                    getCartList();
+                                                    getDocList();
                                                   });
                                                 },
                                               ),
                                               const SizedBox(
                                                 width: 8,
                                               ),
-                                              if (carts[index].ismerge == 0)
-                                                IconButton(
-                                                  color: Colors.red,
-                                                  icon: const Icon(Icons.delete),
-                                                  onPressed: () {
-                                                    _showConfirmationDialog(context, carts[index].docno);
-                                                  },
-                                                ),
                                             ],
                                           ),
                                         ],
@@ -354,7 +251,7 @@ class _CartListScreenState extends State<CartListScreen> {
                               ),
                             ).then((value) {
                               checked = [];
-                              getCartList();
+                              getDocList();
                             });
                           } else {
                             if (checked.where((element) => element).length == 1) {
@@ -411,7 +308,7 @@ class _CartListScreenState extends State<CartListScreen> {
             ElevatedButton(
               child: const Text('ยืนยัน'),
               onPressed: () async {
-                await _webServiceRepository.sendCart(docno).then((value) {
+                await _webServiceRepository.sendSubCart(docno).then((value) {
                   if (value.success) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -419,7 +316,7 @@ class _CartListScreenState extends State<CartListScreen> {
                         backgroundColor: Colors.green,
                       ),
                     );
-                    getCartList();
+                    getDocList();
                     Navigator.of(context).pop();
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -470,7 +367,7 @@ class _CartListScreenState extends State<CartListScreen> {
                         backgroundColor: Colors.green,
                       ),
                     );
-                    getCartList();
+                    getDocList();
                     Navigator.of(context).pop();
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(

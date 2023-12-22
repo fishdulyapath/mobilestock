@@ -10,14 +10,14 @@ UserLoginModel _$UserLoginModelFromJson(Map<String, dynamic> json) =>
     UserLoginModel(
       databasename: json['database_name'] as String,
       provider: json['provider'] as String,
-      usercode: json['user_code'] as String,
-      userpassword: json['user_password'] as String,
+      user: json['user'] as String,
+      pass: json['pass'] as String,
     );
 
 Map<String, dynamic> _$UserLoginModelToJson(UserLoginModel instance) =>
     <String, dynamic>{
       'provider': instance.provider,
       'database_name': instance.databasename,
-      'user_code': instance.usercode,
-      'user_password': instance.userpassword,
+      'user': instance.user,
+      'pass': instance.pass,
     };
