@@ -1,1 +1,1 @@
-String apiserver = "http://192.168.1.2:8084/MobileStockRestService/service/stockservice/";
+String apiserver = "http://43.240.113.43:8776/MobileStockServiceAPI/service/stockservice/";

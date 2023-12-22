@@ -15,7 +15,7 @@ class AuthRepository {
         user: username,
         pass: password,
       );
-      final response = await client.get('/authentication?provider=$provider&user=$username&pass=$password');
+      final response = await client.get('/authentication?provider_name=$provider&database_name=$dbname&user_code=$username&password=$password');
       final rawData = json.decode(response.toString());
       if (rawData['error'] != null) {
         throw Exception('${rawData['code']}: ${rawData['message']}');

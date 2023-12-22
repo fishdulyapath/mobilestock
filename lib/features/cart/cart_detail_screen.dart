@@ -22,6 +22,7 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
   final TextEditingController _controller = TextEditingController();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final WebServiceRepository _webServiceRepository = WebServiceRepository();
+  FocusNode textfocusNode = FocusNode();
   List<ItemScanModel> itemScanList = [];
   @override
   void dispose() {
@@ -64,6 +65,7 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
     }
     await _webServiceRepository.getItemDetail(barcode).then((value) {
       if (value.success) {
+        textfocusNode.requestFocus();
         if (value.data.length > 0) {
           ItemModel item = ItemModel.fromJson(value.data[0]);
 
@@ -242,6 +244,7 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
                       onSubmitted: (value) {
                         getItemDetail();
                       },
+                      focusNode: textfocusNode,
                       controller: _controller,
                       decoration: const InputDecoration(
                         labelText: 'Scan result',

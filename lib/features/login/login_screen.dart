@@ -28,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _dbNameController.text = "ppstest";
     _usernameController.text = "PUI";
     _passwordController.text = "2223";
-    getCartList();
+
     super.initState();
   }
 
@@ -85,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 content: Text('เข้าสู่ระบบเรียบร้อยแล้ว'),
               ),
             );
+            getCartList();
             setState(() {
               showBranchSelect = true;
             });

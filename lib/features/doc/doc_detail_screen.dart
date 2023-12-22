@@ -21,6 +21,7 @@ class DocDetailScreen extends StatefulWidget {
 class _DocDetailScreenState extends State<DocDetailScreen> {
   final TextEditingController _controller = TextEditingController();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  FocusNode textfocusNode = FocusNode();
   final WebServiceRepository _webServiceRepository = WebServiceRepository();
   List<ItemScanModel> itemScanList = [];
   @override
@@ -63,7 +64,7 @@ class _DocDetailScreenState extends State<DocDetailScreen> {
       barcode = textsplit[0];
     }
     ItemScanModel itemCheck = itemScanList.firstWhere((ele) => ele.barcode == barcode, orElse: () => ItemScanModel(barcode: "", itemcode: "", unitcode: "", itemname: ""));
-
+    textfocusNode.requestFocus();
     if (itemCheck.barcode == "") {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -252,6 +253,7 @@ class _DocDetailScreenState extends State<DocDetailScreen> {
                 Expanded(
                   child: TextField(
                     autofocus: true,
+                    focusNode: textfocusNode,
                     onSubmitted: (value) {
                       getItemDetail();
                     },
