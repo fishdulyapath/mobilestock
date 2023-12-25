@@ -6,7 +6,7 @@ class Client {
     Dio dio = Dio();
     dio.interceptors.add(ApiInterceptors());
 
-    String endPointService = apiserver;
+    String endPointService = "http://localhost:8084/MobileStockServiceAPI/service/stockservice/";
     if (endPointService.isNotEmpty) {
       endPointService += endPointService[endPointService.length - 1] == "/" ? "" : "/";
     }

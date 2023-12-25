@@ -24,10 +24,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    _providerController.text = "DATA";
-    _dbNameController.text = "ppstest";
-    _usernameController.text = "PUI";
-    _passwordController.text = "2223";
+    _providerController.text = "";
+    _dbNameController.text = "";
+    _usernameController.text = "";
+    _passwordController.text = "";
 
     super.initState();
   }
@@ -188,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             return Column(
                               children: [
                                 ListTile(
-                                  title: Text(branchList[index].name),
+                                  title: Text(branchList[index].code + '~' + branchList[index].name),
                                   onTap: () {
                                     setState(() {
                                       global.branchCode = branchList[index].code;
