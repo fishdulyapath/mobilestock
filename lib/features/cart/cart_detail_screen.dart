@@ -63,7 +63,7 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
     } else {
       barcode = textsplit[0];
     }
-    await _webServiceRepository.getItemDetail(barcode).then((value) {
+    await _webServiceRepository.getItemDetail(barcode, widget.cart.whcode, widget.cart.locationcode).then((value) {
       if (value.success) {
         textfocusNode.requestFocus();
         if (value.data.length > 0) {
@@ -74,7 +74,8 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
 
           if (checkdata.barcode == "") {
             setState(() {
-              itemScanList.add(ItemScanModel(barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty));
+              itemScanList.add(ItemScanModel(
+                  barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));
               _controller.text = "";
             });
           } else {

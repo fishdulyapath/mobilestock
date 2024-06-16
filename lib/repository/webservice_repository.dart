@@ -139,12 +139,12 @@ class WebServiceRepository {
     }
   }
 
-  Future<ApiResponse> getItemDetail(String barcode) async {
+  Future<ApiResponse> getItemDetail(String barcode, String whcode, String lccode) async {
     global.loadConfig();
     Dio client = Client().init();
 
     try {
-      final response = await client.get('/getItemDetail?provider=${global.serverProvider}&dbname=${global.serverDatabase}&barcode=$barcode');
+      final response = await client.get('/getItemDetail?provider=${global.serverProvider}&dbname=${global.serverDatabase}&barcode=$barcode&whcode=$whcode&lccode=$lccode');
       try {
         final rawData = json.decode(response.toString());
         if (rawData['error'] != null) {

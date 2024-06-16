@@ -12,8 +12,10 @@ class ItemModel {
   final String itemname;
   @JsonKey(name: 'unit_code')
   final String unitcode;
+  @JsonKey(name: 'balance_qty')
+  String balanceqty;
 
-  ItemModel({required this.barcode, required this.itemcode, required this.itemname, required this.unitcode});
+  ItemModel({required this.barcode, required this.itemcode, required this.itemname, required this.unitcode, String? balanceqty}) : balanceqty = balanceqty ?? "0";
 
   factory ItemModel.fromJson(Map<String, dynamic> json) => _$ItemModelFromJson(json);
   Map<String, dynamic> toJson() => _$ItemModelToJson(this);
@@ -32,13 +34,13 @@ class ItemScanModel {
   @JsonKey(name: 'qty')
   int qty;
   @JsonKey(name: 'balance_qty')
-  int balanceqty;
+  double balanceqty;
   @JsonKey(name: 'diff_qty')
   int diff;
   @JsonKey(name: 'is_approve')
   int isapprove;
 
-  ItemScanModel({required this.barcode, required this.itemcode, required this.itemname, required this.unitcode, int? qty, int? balanceqty, int? diff, int? isapprove})
+  ItemScanModel({required this.barcode, required this.itemcode, required this.itemname, required this.unitcode, int? qty, double? balanceqty, int? diff, int? isapprove})
       : qty = qty ?? 0,
         balanceqty = balanceqty ?? 0,
         diff = diff ?? 0,

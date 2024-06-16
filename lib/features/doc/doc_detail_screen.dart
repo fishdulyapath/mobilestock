@@ -76,7 +76,7 @@ class _DocDetailScreenState extends State<DocDetailScreen> {
       return;
     }
 
-    await _webServiceRepository.getItemDetail(barcode).then((value) {
+    await _webServiceRepository.getItemDetail(barcode, widget.cart.whcode, widget.cart.locationcode).then((value) {
       if (value.success) {
         if (value.data.length > 0) {
           ItemModel item = ItemModel.fromJson(value.data[0]);
@@ -86,12 +86,14 @@ class _DocDetailScreenState extends State<DocDetailScreen> {
 
           if (checkdata.barcode == "") {
             setState(() {
-              itemScanList.add(ItemScanModel(barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty));
+              itemScanList.add(ItemScanModel(
+                  barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));
               _controller.text = "";
             });
           } else {
             setState(() {
               itemScanList[itemScanList.indexOf(checkdata)].qty += qty;
+              itemScanList[itemScanList.indexOf(checkdata)].balanceqty = double.parse(item.balanceqty);
               _controller.text = "";
             });
           }

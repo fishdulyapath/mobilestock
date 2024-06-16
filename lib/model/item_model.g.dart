@@ -11,6 +11,7 @@ ItemModel _$ItemModelFromJson(Map<String, dynamic> json) => ItemModel(
       itemcode: json['item_code'] as String,
       itemname: json['item_name'] as String,
       unitcode: json['unit_code'] as String,
+      balanceqty: json['balance_qty'] as String?,
     );
 
 Map<String, dynamic> _$ItemModelToJson(ItemModel instance) => <String, dynamic>{
@@ -18,6 +19,7 @@ Map<String, dynamic> _$ItemModelToJson(ItemModel instance) => <String, dynamic>{
       'item_code': instance.itemcode,
       'item_name': instance.itemname,
       'unit_code': instance.unitcode,
+      'balance_qty': instance.balanceqty,
     };
 
 ItemScanModel _$ItemScanModelFromJson(Map<String, dynamic> json) =>
@@ -26,10 +28,10 @@ ItemScanModel _$ItemScanModelFromJson(Map<String, dynamic> json) =>
       itemcode: json['item_code'] as String,
       itemname: json['item_name'] as String,
       unitcode: json['unit_code'] as String,
-      qty: json['qty'] as int?,
-      balanceqty: json['balance_qty'] as int?,
-      diff: json['diff_qty'] as int?,
-      isapprove: json['is_approve'] as int?,
+      qty: (json['qty'] as num?)?.toInt(),
+      balanceqty: (json['balance_qty'] as num?)?.toDouble(),
+      diff: (json['diff_qty'] as num?)?.toInt(),
+      isapprove: (json['is_approve'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$ItemScanModelToJson(ItemScanModel instance) =>
