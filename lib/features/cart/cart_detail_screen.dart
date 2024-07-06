@@ -74,13 +74,23 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
 
           if (checkdata.barcode == "") {
             setState(() {
-              itemScanList.add(ItemScanModel(
-                  barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));
+              itemScanList.insert(
+                  0,
+                  ItemScanModel(
+                      barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));
+
+              // itemScanList.add(ItemScanModel(
+              //     barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));
               _controller.text = "";
             });
           } else {
             setState(() {
-              itemScanList[itemScanList.indexOf(checkdata)].qty += qty;
+              int index = itemScanList.indexOf(checkdata);
+              itemScanList[index].qty += qty;
+              // Move the updated item to the first position
+              ItemScanModel updatedItem = itemScanList.removeAt(index);
+              itemScanList.insert(0, updatedItem);
+              // itemScanList[itemScanList.indexOf(checkdata)].qty += qty;
               _controller.text = "";
             });
           }

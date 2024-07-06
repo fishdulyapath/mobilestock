@@ -86,15 +86,27 @@ class _DocDetailScreenState extends State<DocDetailScreen> {
 
           if (checkdata.barcode == "") {
             setState(() {
-              itemScanList.add(ItemScanModel(
-                  barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));
+              itemScanList.insert(
+                  0,
+                  ItemScanModel(
+                      barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));
               _controller.text = "";
+              // itemScanList.add(ItemScanModel(
+              //     barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));
+              // _controller.text = "";
             });
           } else {
             setState(() {
-              itemScanList[itemScanList.indexOf(checkdata)].qty += qty;
-              itemScanList[itemScanList.indexOf(checkdata)].balanceqty = double.parse(item.balanceqty);
+              int index = itemScanList.indexOf(checkdata);
+              itemScanList[index].qty += qty;
+              itemScanList[index].balanceqty = double.parse(item.balanceqty);
+              // Move the updated item to the first position
+              ItemScanModel updatedItem = itemScanList.removeAt(index);
+              itemScanList.insert(0, updatedItem);
               _controller.text = "";
+              // itemScanList[itemScanList.indexOf(checkdata)].qty += qty;
+              // itemScanList[itemScanList.indexOf(checkdata)].balanceqty = double.parse(item.balanceqty);
+              // _controller.text = "";
             });
           }
         } else {
