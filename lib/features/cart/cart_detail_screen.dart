@@ -69,10 +69,10 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
         if (value.data.length > 0) {
           ItemModel item = ItemModel.fromJson(value.data[0]);
 
-          ItemScanModel checkdata =
-              itemScanList.firstWhere((ele) => ele.barcode == item.barcode, orElse: () => ItemScanModel(barcode: "", itemcode: "", unitcode: "", itemname: ""));
+          ItemScanModel checkdata = itemScanList.firstWhere((ele) => ele.itemcode == item.itemcode && ele.unitcode == item.unitcode,
+              orElse: () => ItemScanModel(barcode: "", itemcode: "", unitcode: "", itemname: ""));
 
-          if (checkdata.barcode == "") {
+          if (checkdata.itemcode == "") {
             setState(() {
               itemScanList.insert(
                   0,
@@ -313,7 +313,7 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
                             style: const TextStyle(fontSize: 16, color: Colors.blue),
                           ),
                           title: Text(itemScanList[index].itemname),
-                          subtitle: Text("${itemScanList[index].barcode} ${itemScanList[index].unitcode}"),
+                          subtitle: Text("${itemScanList[index].itemcode} ${itemScanList[index].unitcode}"),
                           trailing: (widget.ismerge == 0)
                               ? IconButton(
                                   onPressed: () {

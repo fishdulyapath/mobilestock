@@ -63,38 +63,24 @@ class _DocDetailScreenState extends State<DocDetailScreen> {
     } else {
       barcode = textsplit[0];
     }
-    ItemScanModel itemCheck = itemScanList.firstWhere((ele) => ele.barcode == barcode, orElse: () => ItemScanModel(barcode: "", itemcode: "", unitcode: "", itemname: ""));
-    textfocusNode.requestFocus();
-    if (itemCheck.barcode == "") {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("บาร์โค้ดสินค้าไม่ตรงกับรายการนับซ้ำ"),
-          backgroundColor: Colors.red,
-        ),
-      );
-
-      return;
-    }
 
     await _webServiceRepository.getItemDetail(barcode, widget.cart.whcode, widget.cart.locationcode).then((value) {
       if (value.success) {
         if (value.data.length > 0) {
           ItemModel item = ItemModel.fromJson(value.data[0]);
 
-          ItemScanModel checkdata =
-              itemScanList.firstWhere((ele) => ele.barcode == item.barcode, orElse: () => ItemScanModel(barcode: "", itemcode: "", unitcode: "", itemname: ""));
+          ItemScanModel checkdata = itemScanList.firstWhere((ele) => ele.itemcode == item.itemcode && ele.unitcode == item.unitcode,
+              orElse: () => ItemScanModel(barcode: "", itemcode: "", unitcode: "", itemname: ""));
 
-          if (checkdata.barcode == "") {
-            setState(() {
-              itemScanList.insert(
-                  0,
-                  ItemScanModel(
-                      barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));
-              _controller.text = "";
-              // itemScanList.add(ItemScanModel(
-              //     barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));
-              // _controller.text = "";
-            });
+          if (checkdata.itemcode == "") {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("บาร์โค้ดสินค้าไม่ตรงกับรายการนับซ้ำ"),
+                backgroundColor: Colors.red,
+              ),
+            );
+
+            return;
           } else {
             setState(() {
               int index = itemScanList.indexOf(checkdata);
@@ -328,7 +314,7 @@ class _DocDetailScreenState extends State<DocDetailScreen> {
                             style: const TextStyle(fontSize: 16, color: Colors.blue),
                           ),
                           title: Text(itemScanList[index].itemname),
-                          subtitle: Text("${itemScanList[index].barcode} ${itemScanList[index].unitcode}"),
+                          subtitle: Text("${itemScanList[index].itemcode} ${itemScanList[index].unitcode}"),
                         ));
                   }),
             ),
