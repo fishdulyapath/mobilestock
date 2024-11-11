@@ -278,10 +278,11 @@ packages:
   flutter_barcode_scanner:
     dependency: "direct main"
     description:
-      name: flutter_barcode_scanner
-      sha256: a4ba37daf9933f451a5e812c753ddd045d6354e4a3280342d895b07fecaab3fa
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: master
+      resolved-ref: "13fc0b25b38483dc77f01946260ccd84578a43ee"
+      url: "https://github.com/wrteam-anish/flutter_barcode_scanner.git"
+    source: git
     version: "2.0.0"
   flutter_bloc:
     dependency: "direct main"

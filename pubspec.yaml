@@ -48,7 +48,10 @@ dependencies:
   path_provider: ^2.1.1
   external_path: ^1.0.3
   dropdown_search: ^5.0.6
-  flutter_barcode_scanner: ^2.0.0
+  flutter_barcode_scanner:
+     git:
+       url: https://github.com/wrteam-anish/flutter_barcode_scanner.git
+       ref: master
   qr_code_scanner: ^1.0.1
 
 dev_dependencies:
