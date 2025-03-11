@@ -270,8 +270,8 @@ class WebServiceRepository {
     Dio client = Client().init();
 
     try {
-      final response = await client.post('/createCart?provider=${global.serverProvider}&dbname=${global.serverDatabase}',
-          data: {'docno': docno, 'whcode': whcode, 'locationcode': locationcode, 'remark': remark, 'usercode': global.userCode, 'branchcode': global.branchCode});
+      final response = await client
+          .post('/createCart?provider=${global.serverProvider}&dbname=${global.serverDatabase}', data: {'docno': docno, 'whcode': whcode, 'locationcode': locationcode, 'remark': remark, 'usercode': global.userCode, 'branchcode': global.branchCode});
       try {
         final rawData = json.decode(response.toString());
         if (rawData['error'] != null) {
@@ -290,17 +290,7 @@ class WebServiceRepository {
   Future<ApiResponse> mergeCart(String docno, String docdate, String doctime, String whcode, String locationcode, String remark, String carts) async {
     global.loadConfig();
     Dio client = Client().init();
-    var postData = {
-      'docno': docno,
-      'whcode': whcode,
-      'locationcode': locationcode,
-      'remark': remark,
-      'usercode': global.userCode,
-      'branchcode': global.branchCode,
-      'docdate': docdate,
-      'doctime': doctime,
-      'carts': carts
-    };
+    var postData = {'docno': docno, 'whcode': whcode, 'locationcode': locationcode, 'remark': remark, 'usercode': global.userCode, 'branchcode': global.branchCode, 'docdate': docdate, 'doctime': doctime, 'carts': carts};
     try {
       final response = await client.post('/mergeCart?provider=${global.serverProvider}&dbname=${global.serverDatabase}', data: postData);
       try {
@@ -321,10 +311,12 @@ class WebServiceRepository {
   Future<ApiResponse> saveCartDetail(List<ItemScanModel> item, CartModel cart) async {
     global.loadConfig();
     Dio client = Client().init();
+    item.forEach((element) {
+      element.linenumber = item.indexOf(element) + 1;
+    });
     var detail = item.map((e) => e.toJson()).toList();
     try {
-      final response = await client.post('/saveCartDetail?provider=${global.serverProvider}&dbname=${global.serverDatabase}',
-          data: {'docno': cart.docno, 'whcode': cart.whcode, 'locationcode': cart.locationcode, 'details': detail});
+      final response = await client.post('/saveCartDetail?provider=${global.serverProvider}&dbname=${global.serverDatabase}', data: {'docno': cart.docno, 'whcode': cart.whcode, 'locationcode': cart.locationcode, 'details': detail});
       try {
         final rawData = json.decode(response.toString());
         if (rawData['error'] != null) {
@@ -345,8 +337,7 @@ class WebServiceRepository {
     Dio client = Client().init();
     var detail = item.map((e) => e.toJson()).toList();
     try {
-      final response = await client.post('/saveCartSubDetail?provider=${global.serverProvider}&dbname=${global.serverDatabase}',
-          data: {'docno': cart.docno, 'whcode': cart.whcode, 'locationcode': cart.locationcode, 'details': detail});
+      final response = await client.post('/saveCartSubDetail?provider=${global.serverProvider}&dbname=${global.serverDatabase}', data: {'docno': cart.docno, 'whcode': cart.whcode, 'locationcode': cart.locationcode, 'details': detail});
       try {
         final rawData = json.decode(response.toString());
         if (rawData['error'] != null) {
@@ -367,8 +358,8 @@ class WebServiceRepository {
     Dio client = Client().init();
 
     try {
-      final response = await client.post('/updateCart?provider=${global.serverProvider}&dbname=${global.serverDatabase}',
-          data: {'docno': docno, 'whcode': whcode, 'locationcode': locationcode, 'remark': remark, 'usercode': global.userCode, 'branchcode': global.branchCode});
+      final response = await client
+          .post('/updateCart?provider=${global.serverProvider}&dbname=${global.serverDatabase}', data: {'docno': docno, 'whcode': whcode, 'locationcode': locationcode, 'remark': remark, 'usercode': global.userCode, 'branchcode': global.branchCode});
       try {
         final rawData = json.decode(response.toString());
         if (rawData['error'] != null) {
