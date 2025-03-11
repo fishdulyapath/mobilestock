@@ -26,6 +26,7 @@ CartModel _$CartModelFromJson(Map<String, dynamic> json) => CartModel(
       createdatetime: json['create_datetime'] as String?,
       carts: json['carts'] as String?,
       docref: json['doc_ref'] as String?,
+      isnostock: (json['is_no_stock'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CartModelToJson(CartModel instance) => <String, dynamic>{
@@ -48,6 +49,7 @@ Map<String, dynamic> _$CartModelToJson(CartModel instance) => <String, dynamic>{
       'create_datetime': instance.createdatetime,
       'carts': instance.carts,
       'doc_ref': instance.docref,
+      'is_no_stock': instance.isnostock,
     };
 
 CartDetailModel _$CartDetailModelFromJson(Map<String, dynamic> json) =>

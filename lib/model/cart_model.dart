@@ -42,6 +42,8 @@ class CartModel {
   String carts;
   @JsonKey(name: 'doc_ref')
   String docref;
+  @JsonKey(name: 'is_no_stock')
+  int isnostock;
 
   CartModel({
     String? docno,
@@ -63,6 +65,7 @@ class CartModel {
     String? createdatetime,
     String? carts,
     String? docref,
+    int? isnostock,
   })  : docno = docno ?? '',
         docdate = docdate ?? '',
         doctime = doctime ?? '',
@@ -81,7 +84,8 @@ class CartModel {
         approvedatetime = approvedatetime ?? '',
         createdatetime = createdatetime ?? '',
         carts = carts ?? '',
-        docref = docref ?? '';
+        docref = docref ?? '',
+        isnostock = isnostock ?? 0;
 
   factory CartModel.fromJson(Map<String, dynamic> json) => _$CartModelFromJson(json);
   Map<String, dynamic> toJson() => _$CartModelToJson(this);
