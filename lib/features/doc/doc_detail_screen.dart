@@ -1,13 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:mobilestock/features/cart/cart_detail_screen.dart';
 import 'package:mobilestock/features/cart/cart_item_search.dart';
 import 'package:mobilestock/model/cart_model.dart';
 import 'package:mobilestock/model/item_model.dart';
 import 'package:mobilestock/repository/webservice_repository.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class DocDetailScreen extends StatefulWidget {
   final CartModel cart;
@@ -20,7 +16,6 @@ class DocDetailScreen extends StatefulWidget {
 
 class _DocDetailScreenState extends State<DocDetailScreen> {
   final TextEditingController _controller = TextEditingController();
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   FocusNode textfocusNode = FocusNode();
   final WebServiceRepository _webServiceRepository = WebServiceRepository();
   List<ItemScanModel> itemScanList = [];
@@ -30,27 +25,20 @@ class _DocDetailScreenState extends State<DocDetailScreen> {
   }
 
   Future<void> scanBarcodeNormal() async {
-    String barcodeScanRes;
-
-    try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode('#ff6666', 'Cancel', true, ScanMode.BARCODE);
-      print(barcodeScanRes);
-    } on PlatformException {
-      barcodeScanRes = 'Failed to get platform version.';
-    }
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const BarcodeScannerScreen(),
+      ),
+    );
 
     if (!mounted) return;
-    setState(() {
-      _controller.text += barcodeScanRes;
-      getItemDetail();
-    });
-
-    // if (barcodeScanRes != '-1') {
-    //   setState(() {
-    //     _controller.text += barcodeScanRes;
-    //     getItemDetail();
-    //   });
-    // }
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        _controller.text += result;
+        getItemDetail();
+      });
+    }
   }
 
   void getItemDetail() async {
@@ -69,8 +57,7 @@ class _DocDetailScreenState extends State<DocDetailScreen> {
         if (value.data.length > 0) {
           ItemModel item = ItemModel.fromJson(value.data[0]);
 
-          ItemScanModel checkdata = itemScanList.firstWhere((ele) => ele.itemcode == item.itemcode && ele.unitcode == item.unitcode,
-              orElse: () => ItemScanModel(barcode: "", itemcode: "", unitcode: "", itemname: ""));
+          ItemScanModel checkdata = itemScanList.firstWhere((ele) => ele.itemcode == item.itemcode && ele.unitcode == item.unitcode, orElse: () => ItemScanModel(barcode: "", itemcode: "", unitcode: "", itemname: ""));
 
           if (checkdata.itemcode == "") {
             ScaffoldMessenger.of(context).showSnackBar(

@@ -1,13 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:mobilestock/features/cart/cart_item_search.dart';
 import 'package:mobilestock/model/cart_model.dart';
 import 'package:mobilestock/model/item_model.dart';
 import 'package:mobilestock/repository/webservice_repository.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class CartDetailScreen extends StatefulWidget {
   final CartModel cart;
@@ -20,7 +16,6 @@ class CartDetailScreen extends StatefulWidget {
 
 class _CartDetailScreenState extends State<CartDetailScreen> {
   final TextEditingController _controller = TextEditingController();
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final WebServiceRepository _webServiceRepository = WebServiceRepository();
   FocusNode textfocusNode = FocusNode();
   List<ItemScanModel> itemScanList = [];
@@ -30,27 +25,20 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
   }
 
   Future<void> scanBarcodeNormal() async {
-    String barcodeScanRes;
-
-    try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode('#ff6666', 'Cancel', true, ScanMode.BARCODE);
-      print(barcodeScanRes);
-    } on PlatformException {
-      barcodeScanRes = 'Failed to get platform version.';
-    }
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const BarcodeScannerScreen(),
+      ),
+    );
 
     if (!mounted) return;
-    setState(() {
-      _controller.text += barcodeScanRes;
-      getItemDetail();
-    });
-
-    // if (barcodeScanRes != '-1') {
-    //   setState(() {
-    //     _controller.text += barcodeScanRes;
-    //     getItemDetail();
-    //   });
-    // }
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        _controller.text += result;
+        getItemDetail();
+      });
+    }
   }
 
   void getItemDetail() async {
@@ -420,6 +408,59 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
           ],
         );
       },
+    );
+  }
+}
+
+class BarcodeScannerScreen extends StatefulWidget {
+  const BarcodeScannerScreen({super.key});
+
+  @override
+  State<BarcodeScannerScreen> createState() => _BarcodeScannerScreenState();
+}
+
+class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
+  final MobileScannerController controller = MobileScannerController();
+  bool _isScanned = false;
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Scan Barcode'),
+        backgroundColor: Colors.blue.shade600,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.flash_on),
+            onPressed: () => controller.toggleTorch(),
+          ),
+          IconButton(
+            icon: const Icon(Icons.switch_camera),
+            onPressed: () => controller.switchCamera(),
+          ),
+        ],
+      ),
+      body: MobileScanner(
+        controller: controller,
+        onDetect: (capture) {
+          if (_isScanned) return;
+          final List<Barcode> barcodes = capture.barcodes;
+          for (final barcode in barcodes) {
+            if (barcode.rawValue != null) {
+              _isScanned = true;
+              Navigator.pop(context, barcode.rawValue);
+              break;
+            }
+          }
+        },
+      ),
     );
   }
 }
