@@ -311,9 +311,7 @@ class WebServiceRepository {
   Future<ApiResponse> saveCartDetail(List<ItemScanModel> item, CartModel cart) async {
     global.loadConfig();
     Dio client = Client().init();
-    item.forEach((element) {
-      element.linenumber = item.indexOf(element) + 1;
-    });
+
     var detail = item.map((e) => e.toJson()).toList();
     try {
       final response = await client.post('/saveCartDetail?provider=${global.serverProvider}&dbname=${global.serverDatabase}', data: {'docno': cart.docno, 'whcode': cart.whcode, 'locationcode': cart.locationcode, 'details': detail});

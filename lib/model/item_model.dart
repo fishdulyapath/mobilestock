@@ -41,12 +41,9 @@ class ItemScanModel {
   int isapprove;
   @JsonKey(name: 'is_no_stock')
   int isnostock;
-  @JsonKey(name: 'line_number')
-  int linenumber;
 
-  ItemScanModel({required this.barcode, required this.itemcode, required this.itemname, required this.unitcode, int? qty, double? balanceqty, int? diff, int? isapprove, int? isnostock, int? linenumber})
+  ItemScanModel({required this.barcode, required this.itemcode, required this.itemname, required this.unitcode, int? qty, double? balanceqty, int? diff, int? isapprove, int? isnostock})
       : qty = qty ?? 0,
-        linenumber = linenumber ?? 0,
         isnostock = isnostock ?? 0,
         balanceqty = balanceqty ?? 0,
         diff = diff ?? 0,

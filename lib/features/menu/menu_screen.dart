@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';

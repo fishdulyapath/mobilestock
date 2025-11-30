@@ -33,7 +33,6 @@ ItemScanModel _$ItemScanModelFromJson(Map<String, dynamic> json) =>
       diff: (json['diff_qty'] as num?)?.toInt(),
       isapprove: (json['is_approve'] as num?)?.toInt(),
       isnostock: (json['is_no_stock'] as num?)?.toInt(),
-      linenumber: (json['line_number'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$ItemScanModelToJson(ItemScanModel instance) =>
@@ -47,5 +46,4 @@ Map<String, dynamic> _$ItemScanModelToJson(ItemScanModel instance) =>
       'diff_qty': instance.diff,
       'is_approve': instance.isapprove,
       'is_no_stock': instance.isnostock,
-      'line_number': instance.linenumber,
     };

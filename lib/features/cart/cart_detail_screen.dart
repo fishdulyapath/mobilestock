@@ -69,15 +69,11 @@ class _CartDetailScreenState extends State<CartDetailScreen> {
         if (value.data.length > 0) {
           ItemModel item = ItemModel.fromJson(value.data[0]);
 
-          ItemScanModel checkdata = itemScanList.firstWhere((ele) => ele.itemcode == item.itemcode && ele.unitcode == item.unitcode,
-              orElse: () => ItemScanModel(barcode: "", itemcode: "", unitcode: "", itemname: ""));
+          ItemScanModel checkdata = itemScanList.firstWhere((ele) => ele.itemcode == item.itemcode && ele.unitcode == item.unitcode, orElse: () => ItemScanModel(barcode: "", itemcode: "", unitcode: "", itemname: ""));
 
           if (checkdata.itemcode == "") {
             setState(() {
-              itemScanList.insert(
-                  0,
-                  ItemScanModel(
-                      barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));
+              itemScanList.insert(0, ItemScanModel(barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));
 
               // itemScanList.add(ItemScanModel(
               //     barcode: item.barcode, itemcode: item.itemcode, unitcode: item.unitcode, itemname: item.itemname, qty: qty, balanceqty: double.parse(item.balanceqty)));

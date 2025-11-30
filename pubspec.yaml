@@ -46,7 +46,6 @@ dependencies:
   http: ^1.1.0
   archive: ^3.4.9
   path_provider: ^2.1.1
-  external_path: ^1.0.3
   dropdown_search: ^5.0.6
   flutter_barcode_scanner:
      git:
