@@ -6,7 +6,7 @@ class Client {
     Dio dio = Dio();
     dio.interceptors.add(ApiInterceptors());
 
-    String endPointService = "http://43.240.113.43:8776/MobileStockServiceAPI/service/stockservice/";
+    String endPointService = "http://43.240.113.44:8089/MobileStockServiceAPI/service/stockservice/";
     if (endPointService.isNotEmpty) {
       endPointService += endPointService[endPointService.length - 1] == "/" ? "" : "/";
     }
